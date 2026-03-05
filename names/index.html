@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claim Your Name - WannaBet.eth</title>
+  <meta name="description" content="Claim your free WannaBet.eth subname. Get a human-readable identity for on-chain betting." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Claim Your WannaBet.eth Name" />
+  <meta property="og:description" content="Get a free ENS subname for peer-to-peer betting on Base." />
+  <meta property="og:image" content="https://heywannabet.com/img/og.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://heywannabet.com/names" />
+
+  <link rel="icon" href="/img/logo-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --background: #faf5ef;
+      --foreground: #2d2a26;
+      --coral: #c4654a;
+      --taupe: #8b7d6b;
+      --sand: #f2ebe2;
+      --border: #e8e0d4;
+      --cream: #faf5ef;
+      --mint: #5a7a5e;
+      --error: #c44a4a;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    .bg-gradient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(196,101,74,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 90%, rgba(90,122,94,0.04) 0%, transparent 50%);
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    .header {
+      padding-top: 48px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--taupe);
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: opacity 0.2s;
+    }
+
+    .back-link:hover { opacity: 0.7; }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .logo-img { width: 52px; height: 52px; }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .page-title span { color: var(--coral); }
+
+    .page-subtitle {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--taupe);
+      line-height: 1.6;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    /* Card */
+    .claim-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 2px 12px rgba(139,125,107,0.12);
+      margin-top: 32px;
+      animation: card-mount 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      animation-delay: 100ms;
+    }
+
+    /* Steps */
+    .step {
+      margin-bottom: 24px;
+    }
+
+    .step:last-child { margin-bottom: 0; }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--taupe);
+      margin-bottom: 10px;
+    }
+
+    /* Connect button */
+    .connect-btn {
+      width: 100%;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 14px 20px;
+      border-radius: 16px;
+      border: none;
+      background: var(--foreground);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .connect-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+
+    .connect-btn:active { transform: translateY(0); }
+
+    .connect-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .connected-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--sand);
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .connected-address {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--foreground);
+    }
+
+    .disconnect-btn {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--taupe);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .disconnect-btn:hover { border-color: var(--taupe); }
+
+    /* Name input */
+    .name-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      background: white;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .name-input-row:focus-within { border-color: var(--coral); }
+
+    .name-input {
+      flex: 1;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 16px;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--foreground);
+      min-width: 0;
+    }
+
+    .name-input::placeholder {
+      color: var(--taupe);
+      opacity: 0.5;
+    }
+
+    .name-suffix {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--taupe);
+      padding-right: 16px;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    /* Avatar input */
+    .avatar-input {
+      width: 100%;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--foreground);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .avatar-input::placeholder {
+      color: var(--taupe);
+      opacity: 0.5;
+    }
+
+    .avatar-input:focus { border-color: var(--coral); }
+
+    .avatar-preview {
+      margin-top: 10px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-preview img {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: var(--sand);
+    }
+
+    .avatar-preview-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--taupe);
+    }
+
+    /* Status message */
+    .status-msg {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+
+    .status-msg--available { color: var(--mint); }
+    .status-msg--taken { color: var(--error); }
+    .status-msg--checking { color: var(--taupe); }
+    .status-msg--error { color: var(--error); }
+
+    /* Claim button */
+    .claim-btn {
+      width: 100%;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px 24px;
+      border-radius: 16px;
+      border: none;
+      background: var(--coral);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+      margin-top: 24px;
+    }
+
+    .claim-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+
+    .claim-btn:active { transform: translateY(0); }
+
+    .claim-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Success state */
+    .success-card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px 28px;
+      box-shadow: 0 2px 12px rgba(139,125,107,0.12);
+      margin-top: 32px;
+      text-align: center;
+      animation: card-mount 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      display: none;
+    }
+
+    .success-check {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(90,122,94,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .success-check svg {
+      width: 28px;
+      height: 28px;
+      color: var(--mint);
+    }
+
+    .success-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .success-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--coral);
+      margin-bottom: 16px;
+    }
+
+    .success-desc {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--taupe);
+      line-height: 1.6;
+    }
+
+    /* Existing name card */
+    .existing-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 2px 12px rgba(139,125,107,0.12);
+      margin-top: 32px;
+      text-align: center;
+      animation: card-mount 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      display: none;
+    }
+
+    .existing-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .existing-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--coral);
+      margin-bottom: 4px;
+    }
+
+    .existing-desc {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--taupe);
+    }
+
+    /* No wallet */
+    .no-wallet-msg {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--taupe);
+      line-height: 1.6;
+      padding: 8px 0;
+    }
+
+    .no-wallet-msg a {
+      color: var(--coral);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .no-wallet-msg a:hover { text-decoration: underline; }
+
+    /* Footer */
+    .footer {
+      margin-top: 48px;
+      padding-bottom: 32px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--taupe);
+      opacity: 0.5;
+    }
+
+    .footer a {
+      color: var(--taupe);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .footer a:hover { opacity: 1; }
+
+    /* Disabled overlay for steps */
+    .step--disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    @keyframes card-mount {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .header { padding-top: 32px; }
+      .logo-img { width: 44px; height: 44px; }
+      .page-title { font-size: 24px; }
+      .claim-card, .success-card, .existing-card { padding: 22px; border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <a href="/" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </a>
+      <div class="logo-row">
+        <img src="/img/logo.png" alt="WannaBet" class="logo-img" />
+      </div>
+      <h1 class="page-title">Claim your <span>.wannabet.eth</span> name</h1>
+      <p class="page-subtitle">Get a free ENS subname tied to your wallet. Use it across WannaBet and any ENS-compatible app.</p>
+    </header>
+
+    <!-- Claim Card -->
+    <div class="claim-card" id="claim-card">
+      <!-- Step 1: Connect Wallet -->
+      <div class="step" id="step-connect">
+        <div class="step-label">Step 1 &mdash; Connect Wallet</div>
+        <div id="connect-area">
+          <button class="connect-btn" id="connect-btn" onclick="connectWallet()">Connect Wallet</button>
+        </div>
+        <div id="connected-area" style="display:none;">
+          <div class="connected-info">
+            <span class="connected-address" id="connected-address"></span>
+            <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+          </div>
+        </div>
+        <div id="no-wallet" class="no-wallet-msg" style="display:none;">
+          No wallet detected. Install <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> or use a browser with a built-in wallet.
+        </div>
+      </div>
+
+      <!-- Step 2: Choose Name -->
+      <div class="step step--disabled" id="step-name">
+        <div class="step-label">Step 2 &mdash; Choose Your Name</div>
+        <div class="name-input-row">
+          <input
+            type="text"
+            class="name-input"
+            id="name-input"
+            placeholder="yourname"
+            maxlength="32"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            oninput="handleNameInput(this)"
+          />
+          <span class="name-suffix">.wannabet.eth</span>
+        </div>
+        <div class="status-msg" id="name-status"></div>
+      </div>
+
+      <!-- Step 3: Avatar (optional) -->
+      <div class="step step--disabled" id="step-avatar">
+        <div class="step-label">Step 3 &mdash; Avatar (optional)</div>
+        <input
+          type="url"
+          class="avatar-input"
+          id="avatar-input"
+          placeholder="https://example.com/your-avatar.png"
+          oninput="handleAvatarInput(this)"
+        />
+        <div class="avatar-preview" id="avatar-preview">
+          <img id="avatar-preview-img" src="" alt="Avatar preview" onerror="this.style.display='none'" onload="this.style.display='block'" />
+          <span class="avatar-preview-name" id="avatar-preview-name"></span>
+        </div>
+      </div>
+
+      <!-- Claim Button -->
+      <button class="claim-btn" id="claim-btn" disabled onclick="claimName()">Claim Name</button>
+    </div>
+
+    <!-- Existing Name Card (shown if wallet already has a subname) -->
+    <div class="existing-card" id="existing-card">
+      <div class="existing-title">You already have a name</div>
+      <div class="existing-name" id="existing-name"></div>
+      <div class="existing-desc">Each wallet can only claim one WannaBet.eth subname.</div>
+    </div>
+
+    <!-- Success Card -->
+    <div class="success-card" id="success-card">
+      <div class="success-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+      </div>
+      <div class="success-title">You're all set!</div>
+      <div class="success-name" id="success-name"></div>
+      <div class="success-desc">Your name is live and will show up across WannaBet and ENS-compatible apps.</div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <a href="/">heywannabet.com</a>
+    </div>
+  </div>
+
+  <script>
+    var connectedAddress = null
+    var nameAvailable = false
+    var checkTimeout = null
+
+    function shortenAddress(addr) {
+      return addr.slice(0, 6) + '...' + addr.slice(-4)
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        document.getElementById('connect-area').style.display = 'none'
+        document.getElementById('no-wallet').style.display = 'block'
+        return
+      }
+
+      var btn = document.getElementById('connect-btn')
+      btn.textContent = 'Connecting...'
+      btn.disabled = true
+
+      try {
+        var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+        if (accounts && accounts.length > 0) {
+          connectedAddress = accounts[0]
+          document.getElementById('connect-area').style.display = 'none'
+          document.getElementById('connected-address').textContent = shortenAddress(connectedAddress)
+          document.getElementById('connected-area').style.display = 'block'
+          document.getElementById('step-name').classList.remove('step--disabled')
+          document.getElementById('step-avatar').classList.remove('step--disabled')
+
+          // Check if wallet already has a subname
+          await checkExistingName()
+        }
+      } catch (err) {
+        btn.textContent = 'Connect Wallet'
+        btn.disabled = false
+      }
+    }
+
+    function disconnectWallet() {
+      connectedAddress = null
+      nameAvailable = false
+      document.getElementById('connected-area').style.display = 'none'
+      document.getElementById('connect-area').style.display = 'block'
+      document.getElementById('connect-btn').textContent = 'Connect Wallet'
+      document.getElementById('connect-btn').disabled = false
+      document.getElementById('step-name').classList.add('step--disabled')
+      document.getElementById('step-avatar').classList.add('step--disabled')
+      document.getElementById('name-input').value = ''
+      document.getElementById('name-status').textContent = ''
+      document.getElementById('avatar-input').value = ''
+      document.getElementById('avatar-preview').style.display = 'none'
+      document.getElementById('claim-btn').disabled = true
+      document.getElementById('claim-card').style.display = 'block'
+      document.getElementById('existing-card').style.display = 'none'
+      document.getElementById('success-card').style.display = 'none'
+    }
+
+    async function checkExistingName() {
+      try {
+        var res = await fetch('/api/get-names?address=' + encodeURIComponent(connectedAddress))
+        var data = await res.json()
+        if (data.names && data.names.length > 0) {
+          document.getElementById('existing-name').textContent = data.names[0].name + '.wannabet.eth'
+          document.getElementById('claim-card').style.display = 'none'
+          document.getElementById('existing-card').style.display = 'block'
+        }
+      } catch (err) {
+        // Silently continue — they can still try to claim
+      }
+    }
+
+    function handleNameInput(input) {
+      var raw = input.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+      input.value = raw
+
+      var status = document.getElementById('name-status')
+      nameAvailable = false
+      updateClaimButton()
+
+      if (!raw) {
+        status.textContent = ''
+        status.className = 'status-msg'
+        return
+      }
+
+      status.textContent = 'Checking...'
+      status.className = 'status-msg status-msg--checking'
+
+      clearTimeout(checkTimeout)
+      checkTimeout = setTimeout(function() { checkAvailability(raw) }, 400)
+    }
+
+    async function checkAvailability(name) {
+      var status = document.getElementById('name-status')
+      try {
+        var res = await fetch('/api/check-name?name=' + encodeURIComponent(name))
+        var data = await res.json()
+
+        // Make sure the input hasn't changed while we were fetching
+        if (document.getElementById('name-input').value !== name) return
+
+        if (data.available) {
+          status.textContent = name + '.wannabet.eth is available!'
+          status.className = 'status-msg status-msg--available'
+          nameAvailable = true
+        } else {
+          status.textContent = name + '.wannabet.eth is already taken'
+          status.className = 'status-msg status-msg--taken'
+          nameAvailable = false
+        }
+      } catch (err) {
+        status.textContent = 'Could not check availability'
+        status.className = 'status-msg status-msg--error'
+        nameAvailable = false
+      }
+
+      updateClaimButton()
+    }
+
+    function handleAvatarInput(input) {
+      var preview = document.getElementById('avatar-preview')
+      var img = document.getElementById('avatar-preview-img')
+      var label = document.getElementById('avatar-preview-name')
+      var name = document.getElementById('name-input').value
+
+      if (input.value) {
+        img.src = input.value
+        label.textContent = (name || 'yourname') + '.wannabet.eth'
+        preview.style.display = 'flex'
+      } else {
+        preview.style.display = 'none'
+      }
+    }
+
+    function updateClaimButton() {
+      var btn = document.getElementById('claim-btn')
+      btn.disabled = !(connectedAddress && nameAvailable)
+    }
+
+    async function claimName() {
+      var btn = document.getElementById('claim-btn')
+      var name = document.getElementById('name-input').value
+      var avatar = document.getElementById('avatar-input').value
+      var status = document.getElementById('name-status')
+
+      if (!connectedAddress || !name || !nameAvailable) return
+
+      btn.textContent = 'Claiming...'
+      btn.disabled = true
+
+      try {
+        var body = { name: name, address: connectedAddress }
+        if (avatar) body.avatar = avatar
+
+        var res = await fetch('/api/claim-name', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+
+        var data = await res.json()
+
+        if (res.ok && data.success) {
+          document.getElementById('success-name').textContent = name + '.wannabet.eth'
+          document.getElementById('claim-card').style.display = 'none'
+          document.getElementById('success-card').style.display = 'block'
+        } else {
+          status.textContent = data.error || 'Failed to claim name'
+          status.className = 'status-msg status-msg--error'
+          btn.textContent = 'Claim Name'
+          btn.disabled = false
+        }
+      } catch (err) {
+        status.textContent = 'Network error. Please try again.'
+        status.className = 'status-msg status-msg--error'
+        btn.textContent = 'Claim Name'
+        btn.disabled = false
+      }
+    }
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', function(accounts) {
+        if (accounts.length === 0) {
+          disconnectWallet()
+        } else {
+          connectedAddress = accounts[0]
+          document.getElementById('connected-address').textContent = shortenAddress(connectedAddress)
+          document.getElementById('name-input').value = ''
+          document.getElementById('name-status').textContent = ''
+          nameAvailable = false
+          updateClaimButton()
+          document.getElementById('existing-card').style.display = 'none'
+          document.getElementById('claim-card').style.display = 'block'
+          checkExistingName()
+        }
+      })
+    }
+  </script>
+</body>
+</html>
